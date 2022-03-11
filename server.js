@@ -3,11 +3,14 @@ const app = express();
 
 const morgan = require('morgan');
 const cors = require('cors');
+const req = require('express/lib/request');
+
+const envelopes = require('./db.js')
 
 const PORT = process.env.PORT || 3000;
 
-app.get("/", (req, res, next) => {
-    console.log("Hello World");
+app.get("/envelopes", (req, res, next) => {
+    res.send(envelopes);
 })
 
 
