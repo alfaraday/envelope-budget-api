@@ -3,14 +3,43 @@ const app = express();
 
 const morgan = require('morgan');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const req = require('express/lib/request');
 
 const envelopes = require('./db.js')
 
 const PORT = process.env.PORT || 3000;
 
-app.get("/envelopes", (req, res, next) => {
+app.use(bodyParser.json());
+
+const getNextId = () => {
+    const list = envelopes;
+    return list.sort((a, b) => b.id - a.id)[0].id + 1;
+}
+
+app.get('/envelopes', (req, res, next) => {
     res.send(envelopes);
+})
+
+app.post('/envelopes', (req, res, next) => {
+    const category = req.body.category;
+    const limit = Number(req.body.limit);
+    if (
+        category &&
+        typeof category == "string" &&
+        limit > 0
+    ) {
+        const newEnvelope = {
+            id: getNextId(),
+            category: category,
+            limit: limit,
+            balance: limit
+        }
+        envelopes.push(newEnvelope);
+        res.status(201).send(newEnvelope);
+    } else {
+        res.status(404).send('Invalid envelope');
+    }
 })
 
 
