@@ -13,8 +13,8 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 const getNextId = () => {
-    const list = envelopes;
-    return list.sort((a, b) => b.id - a.id)[0].id + 1;
+    const id = envelopes[envelopes.length - 1].id + 1;
+    return id;
 }
 
 app.get('/envelopes', (req, res, next) => {
