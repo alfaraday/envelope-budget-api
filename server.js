@@ -4,7 +4,6 @@ const app = express();
 const morgan = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const req = require('express/lib/request');
 
 const envelopes = require('./db.js')
 
@@ -17,9 +16,20 @@ const getNextId = () => {
     return id;
 }
 
+app.param('envelopeId', (req, res, next, id) => {
+    const envelope = envelopes.find(item => item.id == id)
+    if (envelope) {
+        req.envelope = envelope;
+        req.id = id;
+        next();
+    } else {
+        res.status(404).send('Invalid envelope');
+    }
+})
+
 app.get('/envelopes', (req, res, next) => {
     res.send(envelopes);
-})
+});
 
 app.post('/envelopes', (req, res, next) => {
     const category = req.body.category;
@@ -40,6 +50,14 @@ app.post('/envelopes', (req, res, next) => {
     } else {
         res.status(404).send('Invalid envelope');
     }
+});
+
+app.get('/envelopes/:envelopeId', (req, res, next) => {
+    res.send(req.envelope);
+})
+
+app.put('/envelopes/:envelopeId', (req, res, next) => {
+
 })
 
 
