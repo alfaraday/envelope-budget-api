@@ -80,6 +80,10 @@ app.put('/envelopes/:envelopeId', (req, res, next) => {
     }
 })
 
+app.delete('/envelopes/:envelopeId', (req, res, next) => {
+    envelopes.splice(req.index, 1);
+    res.status(204).send();
+})
 
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
