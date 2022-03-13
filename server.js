@@ -21,6 +21,7 @@ app.param('envelopeId', (req, res, next, id) => {
     if (envelope) {
         req.envelope = envelope;
         req.id = id;
+        req.index = envelopes.findIndex(item => item.id == req.id);
         next();
     } else {
         res.status(404).send('Invalid envelope');
@@ -44,7 +45,7 @@ app.post('/envelopes', (req, res, next) => {
             category: category,
             limit: limit,
             balance: limit
-        }
+        };
         envelopes.push(newEnvelope);
         res.status(201).send(newEnvelope);
     } else {
@@ -57,7 +58,26 @@ app.get('/envelopes/:envelopeId', (req, res, next) => {
 })
 
 app.put('/envelopes/:envelopeId', (req, res, next) => {
-
+    const category = req.body.category;
+    const limit = Number(req.body.limit);
+    const balance = Number(req.body.balance);
+    if (
+        category &&
+        typeof category == "string" &&
+        limit > 0 &&
+        (balance || balance === 0)
+    ) {
+        const newEnvelope = {
+            id: req.id,
+            category: category,
+            limit: limit,
+            balance: balance
+        };
+        envelopes[req.index] = newEnvelope;
+        res.send(newEnvelope);
+    } else {
+        res.status(400).send('Invalid request');
+    }
 })
 
 
