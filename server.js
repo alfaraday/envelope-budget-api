@@ -9,6 +9,8 @@ const envelopes = require('./db.js')
 
 const PORT = process.env.PORT || 3000;
 
+app.use(cors());
+app.use(morgan('tiny'));
 app.use(bodyParser.json());
 
 const getNextId = () => {
