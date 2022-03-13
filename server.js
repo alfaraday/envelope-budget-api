@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
+// Imports "database"
 const envelopes = require('./db.js')
 
 const PORT = process.env.PORT || 3000;
@@ -13,11 +14,13 @@ app.use(cors());
 app.use(morgan('tiny'));
 app.use(bodyParser.json());
 
+// Calculate the next id to use for a new envelope
 const getNextId = () => {
     const id = envelopes[envelopes.length - 1].id + 1;
     return id;
 }
 
+// Validate envelopeId exists
 app.param('envelopeId', (req, res, next, id) => {
     const envelope = envelopes.find(item => item.id == id)
     if (envelope) {
@@ -30,10 +33,12 @@ app.param('envelopeId', (req, res, next, id) => {
     }
 })
 
+// Get all envelopes
 app.get('/envelopes', (req, res, next) => {
     res.send(envelopes);
 });
 
+// Create a new envelope
 app.post('/envelopes', (req, res, next) => {
     const category = req.body.category;
     const limit = Number(req.body.limit);
@@ -55,10 +60,12 @@ app.post('/envelopes', (req, res, next) => {
     }
 });
 
+// Get single envelope by ID
 app.get('/envelopes/:envelopeId', (req, res, next) => {
     res.send(req.envelope);
 })
 
+// Update envelope by ID
 app.put('/envelopes/:envelopeId', (req, res, next) => {
     const category = req.body.category;
     const limit = Number(req.body.limit);
@@ -82,6 +89,7 @@ app.put('/envelopes/:envelopeId', (req, res, next) => {
     }
 })
 
+// Delete envelope by ID
 app.delete('/envelopes/:envelopeId', (req, res, next) => {
     envelopes.splice(req.index, 1);
     res.status(204).send();
