@@ -27,6 +27,21 @@ app.param('envelopeId', (req, res, next, id) => {
         req.envelope = envelope;
         req.id = id;
         req.index = envelopes.findIndex(item => item.id == req.id);
+        console.log(`From Index: ${req.index}`);
+        next();
+    } else {
+        res.status(404).send('Invalid envelope');
+    }
+})
+
+// Validate transfer to Id exists
+app.param('toId', (req, res, next, id) => {
+    const envelope = envelopes.find(item => item.id == id)
+    if (envelope) {
+        req.toEnvelope = envelope;
+        req.toId = id;
+        req.toIndex = envelopes.findIndex(item => item.id == req.toId);
+        console.log(`To Index: ${req.toIndex}`);
         next();
     } else {
         res.status(404).send('Invalid envelope');
@@ -94,6 +109,29 @@ app.delete('/envelopes/:envelopeId', (req, res, next) => {
     envelopes.splice(req.index, 1);
     res.status(204).send();
 })
+
+// Transfer balance
+app.post('/envelopes/:envelopeId/transfer/:toId', (req, res, next) => {
+    const amount = Number(req.body.amount);
+    if (
+        req.envelope.balance >= amount
+    ) {
+        // fromEnvelope
+        let fromEnvelope = req.envelope;
+        fromEnvelope.balance -= amount;
+        envelopes[req.index] = fromEnvelope;
+        console.log(envelopes);
+        // toEnvelope
+        let toEnvelope = req.toEnvelope;
+        toEnvelope.balance += amount;
+        console.log(req.toIndex);
+        envelopes[req.toIndex] = toEnvelope;
+        console.log(envelopes);
+        res.send(`${amount} transferred from ${fromEnvelope.category} to ${toEnvelope.category}`);
+    } else {
+        res.status(404).send('Invalid transfer');
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
